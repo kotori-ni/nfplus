@@ -42,6 +42,9 @@ public class Modifier{
     @TableField(exist = false)
     private String creatorName;             //创建者名称
 
+    @TableField(exist = false)
+    private Integer quoteNum;               //引用数量
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -4,7 +4,7 @@
  * @email: 1301457114@qq.com
  * @Date: 2023-07-29 18:15:49
  * @LastEditors: wch
- * @LastEditTime: 2023-08-15 10:28:11
+ * @LastEditTime: 2023-08-15 14:40:34
  */
 
 package com.example.nfplus.mapper;
@@ -24,8 +24,8 @@ import java.util.List;
 public interface TimeCycleMapper extends BaseMapper<TimeCycle> {
 	/**
 	 * @description: 按搜索条件查询时间周期
-	 * @param {User}                    user 用户信息
-	 * @param {QueryWrapper<TimeCycle>} queryWrapper 查询条件
+	 * @param user 请求查询的用户
+	 * @param queryWrapper 查询条件
 	 * @return {List<TimeCycle>} 时间周期列表
 	 * @author: wch
 	 */
@@ -36,16 +36,19 @@ public interface TimeCycleMapper extends BaseMapper<TimeCycle> {
 			"LEFT JOIN user_collections c ON #{user.userId} = c.user_id AND t.time_cycle_id = c.time_cycle_id " +
 			"${ew.customSqlSegment}")
 	@Results({
+			@Result(property = "timeCycleId", column = "time_cycle_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
 			@Result(property = "creatorName", column = "username", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-			@Result(property = "isCollect", column = "isCollect", javaType = Boolean.class, jdbcType = JdbcType.BOOLEAN)
+			@Result(property = "isCollect", column = "isCollect", javaType = Boolean.class, jdbcType = JdbcType.BOOLEAN),
+			@Result(property = "quoteNum", column = "time_cycle_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER,
+					one = @One(select = "com.example.nfplus.mapper.TimeCycleMapper.selectQuoteIndicatorNum"))
 	})
 	List<TimeCycle> selectTimeCycles(User user, @Param("ew") QueryWrapper<TimeCycle> queryWrapper);
 
 	/**
 	 * @description: 按搜索条件分页查询时间周期
-	 * @param {Page<TimeCycle>}         page 分页信息
-	 * @param {User}                    user 用户信息
-	 * @param {QueryWrapper<TimeCycle>} queryWrapper 查询条件
+	 * @param page 分页信息
+	 * @param user 请求查询的用户
+	 * @param queryWrapper 查询条件
 	 * @return {List<TimeCycle>} 时间周期列表
 	 */
 	@Select("SELECT t.*, u.username, c.collection_id, " +
@@ -55,15 +58,27 @@ public interface TimeCycleMapper extends BaseMapper<TimeCycle> {
 			"LEFT JOIN user_collections c ON #{user.userId} = c.user_id AND t.time_cycle_id = c.time_cycle_id " +
 			"${ew.customSqlSegment}")
 	@Results({
+			@Result(property = "timeCycleId", column = "time_cycle_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
 			@Result(property = "creatorName", column = "username", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-			@Result(property = "isCollect", column = "isCollect", javaType = Boolean.class, jdbcType = JdbcType.BOOLEAN)
+			@Result(property = "isCollect", column = "isCollect", javaType = Boolean.class, jdbcType = JdbcType.BOOLEAN),
+			@Result(property = "quoteNum", column = "time_cycle_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER,
+					one = @One(select = "com.example.nfplus.mapper.TimeCycleMapper.selectQuoteIndicatorNum"))
 	})
 	List<TimeCycle> selectTimeCycles(Page<TimeCycle> page, User user,
 			@Param("ew") QueryWrapper<TimeCycle> queryWrapper);
 
 	/**
+	 * @description: 查询引用了该时间周期的指标数量
+	 * @param id 时间周期id
+	 * @return {Integer} 指标数量
+	 * @author: wch
+	 */
+	@Select("select count(*) from indicators where time_cycle_id = #{id}")
+	Integer selectQuoteIndicatorNum(int id);
+
+	/**
 	 * @description: 查询引用了该时间周期的指标列表
-	 * @param {int} id 时间周期id
+	 * @param id 时间周期id
 	 * @return {List<Indicator>} 指标列表
 	 * @author: wch
 	 */

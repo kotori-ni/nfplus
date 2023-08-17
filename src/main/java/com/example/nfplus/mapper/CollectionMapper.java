@@ -19,6 +19,7 @@ import org.apache.ibatis.annotations.Select;
 public interface CollectionMapper extends BaseMapper<Collection> {
     /**
      * @description: 根据指标id查询指标收藏数量
+     * @param id 指标id
      * @return {Integer} 指标的收藏数量
      * @author: wch
      */    

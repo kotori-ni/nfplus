@@ -4,7 +4,7 @@
  * @email: 1301457114@qq.com
  * @Date: 2023-07-29 16:58:54
  * @LastEditors: wch
- * @LastEditTime: 2023-08-15 14:20:10
+ * @LastEditTime: 2023-08-16 10:15:05
  */
 package com.example.nfplus.serviceImpl;
 
@@ -38,12 +38,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     /**
      * @description: 用户登录,生成用户token
-     * @param {User} user 登录用户
+     * @param user 待登录的用户
      * @return {User} 登录成功的用户信息
      * @author: wch
-     */   
+     */
     @Override
-    public User userLogin(User user){
+    public User userLogin(User user) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", user.getUsername());
         queryWrapper.eq("password", user.getPassword());
@@ -52,21 +52,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     /**
      * @description: 根据token查找用户
-     * @param {String} token
+     * @param token 用户token
      * @return {User} 用户信息
      * @author: wch
-     */   
+     */
     @Override
     public User findUserByToken(String token) {
         String username = JwtUtils.getClaimsByToken(token).getSubject();
-        return query().eq("username", username).one();
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("username", username);
+        return getOne(queryWrapper);
     }
 
     /**
      * @description: 获取用户首页的信息(指标数量,衍生词数量,收藏指标数量...)
      * @return {List<Map<String, Object>>} 首页信息
      * @author: wch
-     */ 
+     */
     @Override
     public List<Map<String, Object>> getIndexInfo() {
         List<Map<String, Object>> informations = new ArrayList<>();
@@ -116,10 +118,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     /**
      * @description: 验证用户信息是否正确
-     * @param {User} user 待验证的用户对象
+     * @param user 待验证的用户对象
      * @return {Boolean} 验证结果,正确返回true,错误返回false
      * @author: wch
-     */ 
+     */
     @Override
     public Boolean verifyUser(User user) {
         if (user.getUsername() == null || user.getUsername().length() == 0)
@@ -133,7 +135,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     /**
      * @description: 验证邮箱是否合法
-     * @param {String} email 待验证的邮箱
+     * @param email 待验证的邮箱
      * @return {Boolean} 验证结果,正确返回true,错误返回false
      */
     private boolean isValidEmail(String email) {

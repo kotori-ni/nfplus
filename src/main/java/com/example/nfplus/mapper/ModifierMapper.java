@@ -4,7 +4,7 @@
  * @email: 1301457114@qq.com
  * @Date: 2023-07-29 18:15:11
  * @LastEditors: wch
- * @LastEditTime: 2023-08-15 10:22:20
+ * @LastEditTime: 2023-08-15 14:40:51
  */
 
 package com.example.nfplus.mapper;
@@ -23,8 +23,8 @@ import java.util.List;
 public interface ModifierMapper extends BaseMapper<Modifier> {
 	/**
 	 * @description: 按搜索条件查询修饰词
-	 * @param {User}                   user
-	 * @param {QueryWrapper<Modifier>} queryWrapper 查询条件
+	 * @param user         请求查询的用户
+	 * @param queryWrapper 查询条件
 	 * @return {List<Modifier>} 修饰词列表
 	 * @author: wch
 	 */
@@ -38,15 +38,18 @@ public interface ModifierMapper extends BaseMapper<Modifier> {
 			@Result(property = "modifierId", column = "modifier_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
 			@Result(property = "creatorName", column = "username", javaType = String.class, jdbcType = JdbcType.VARCHAR),
 			@Result(property = "isCollect", column = "isCollect", javaType = Boolean.class, jdbcType = JdbcType.BOOLEAN),
-			@Result(property = "modifierValues", column = "modifier_id", javaType = List.class, jdbcType = JdbcType.VARCHAR, many = @Many(select = "com.example.nfplus.mapper.ModifierMapper.selectModifierByKeyId"))
+			@Result(property = "modifierValues", column = "modifier_id", javaType = List.class, jdbcType = JdbcType.VARCHAR,
+					many = @Many(select = "com.example.nfplus.mapper.ModifierMapper.selectModifierByKeyId")),
+			@Result(property = "quoteNum", column = "modifier_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER,
+					one = @One(select = "com.example.nfplus.mapper.ModifierMapper.selectQuoteIndicatorNum"))
 	})
 	List<Modifier> selectModifiers(User user, @Param("ew") QueryWrapper<Modifier> queryWrapper);
 
 	/**
 	 * @description: 按搜索条件分页查询修饰词
-	 * @param {Page<Modifier>}         page 分页信息
-	 * @param {User}                   user
-	 * @param {QueryWrapper<Modifier>} queryWrapper 查询条件
+	 * @param page         分页信息
+	 * @param user         请求查询的用户
+	 * @param queryWrapper 查询条件
 	 * @return {List<Modifier>} 修饰词列表
 	 * @author: wch
 	 */
@@ -60,13 +63,16 @@ public interface ModifierMapper extends BaseMapper<Modifier> {
 			@Result(property = "modifierId", column = "modifier_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
 			@Result(property = "creatorName", column = "username", javaType = String.class, jdbcType = JdbcType.VARCHAR),
 			@Result(property = "isCollect", column = "isCollect", javaType = Boolean.class, jdbcType = JdbcType.BOOLEAN),
-			@Result(property = "modifierValues", column = "modifier_id", javaType = List.class, jdbcType = JdbcType.VARCHAR, many = @Many(select = "com.example.nfplus.mapper.ModifierMapper.selectModifierByKeyId"))
+			@Result(property = "modifierValues", column = "modifier_id", javaType = List.class, jdbcType = JdbcType.VARCHAR,
+					many = @Many(select = "com.example.nfplus.mapper.ModifierMapper.selectModifierByKeyId")),
+			@Result(property = "quoteNum", column = "modifier_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER,
+					one = @One(select = "com.example.nfplus.mapper.ModifierMapper.selectQuoteIndicatorNum"))
 	})
 	List<Modifier> selectModifiers(Page<Modifier> page, User user, @Param("ew") QueryWrapper<Modifier> queryWrapper);
 
 	/**
 	 * @description: 查询修饰词键的所有修饰词值
-	 * @param {int} id 修饰词键id
+	 * @param id 修饰词键id
 	 * @return {List<Modifier>} 修饰词值列表
 	 * @author: wch
 	 */
@@ -75,7 +81,7 @@ public interface ModifierMapper extends BaseMapper<Modifier> {
 
 	/**
 	 * @description: 查询修饰词键的所有修饰词值名称
-	 * @param {int} id 修饰词键id
+	 * @param id 修饰词键id
 	 * @return {List<String>} 修饰词值名称列表
 	 * @author: wch
 	 */
@@ -83,8 +89,17 @@ public interface ModifierMapper extends BaseMapper<Modifier> {
 	List<String> getModifierValueNameByKeyId(int id);
 
 	/**
+	 * @description: 查询引用了该修饰词的指标数量
+	 * @param id 修饰词id
+	 * @return {Integer} 指标数量
+	 * @author: wch
+	 */
+	@Select("select count(*) from indicator_modifier where modifier_id = #{id}")
+	Integer selectQuoteIndicatorNum(int id);
+
+	/**
 	 * @description: 查询引用了该修饰词的指标id列表
-	 * @param {int} id 修饰词id
+	 * @param id 修饰词id
 	 * @return {List<String>} 指标id列表
 	 * @author: wch
 	 */

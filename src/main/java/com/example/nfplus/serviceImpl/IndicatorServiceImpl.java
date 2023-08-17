@@ -4,7 +4,7 @@
  * @email: 1301457114@qq.com
  * @Date: 2023-07-29 21:00:23
  * @LastEditors: wch
- * @LastEditTime: 2023-08-15 14:20:59
+ * @LastEditTime: 2023-08-17 14:48:54
  */
 package com.example.nfplus.serviceImpl;
 
@@ -39,13 +39,13 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
 
     /**
      * @description: 获取指标详细信息
-     * @param {User} user 请求查询指标的用户
-     * @param {String} indicatorId 指标id
+     * @param user        请求查询指标的用户
+     * @param indicatorId 指标id
      * @return {Indicator} 指标信息
      * @author: wch
-     */   
+     */
     @Override
-    public Indicator getOneIndicator(User user, String indicatorId){
+    public Indicator getOneIndicator(User user, String indicatorId) {
         Indicator indicator = indicatorMapper.selectOneIndicator(user, indicatorId);
         getIndicatorInfo(indicator);
         return indicator;
@@ -55,7 +55,7 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
      * @description: 获取浏览量最高的五个指标
      * @return {List<Indicator>} 指标列表
      * @author: wch
-     */    
+     */
     @Override
     public List<Indicator> getViewMaxIndicators() {
         QueryWrapper<Indicator> queryWrapper = new QueryWrapper<>();
@@ -66,10 +66,10 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
 
     /**
      * @description: 获取用户收藏的所有指标
-     * @param {User} user 请求查询的用户
+     * @param user 请求查询的用户
      * @return {List<Indicator>} 指标列表
      * @author: wch
-     */  
+     */
     @Override
     public List<Indicator> getUserFavourIndicators(User user) {
         QueryWrapper<Indicator> queryWrapper = new QueryWrapper<>();
@@ -79,19 +79,19 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
 
     /**
      * @description: 分页按搜索条件获取用户收藏的指标
-     * @param {User} user 请求查询的用户
-     * @param {IndicatorQuery} indicatorQuery 分页查询条件
+     * @param user           请求查询的用户
+     * @param indicatorQuery 分页查询条件
      * @return {Page<Indicator>} 指标分页列表
      * @author: wch
-     */    
+     */
     @Override
     public Page<Indicator> getUserFavourIndicatorsWithPage(User user, IndicatorQuery indicatorQuery) {
         QueryWrapper<Indicator> queryWrapper = getQueryWrapper(indicatorQuery);
         queryWrapper.isNotNull("collection_id");
         Page<Indicator> page = new Page<>(indicatorQuery.getPage(), indicatorQuery.getPageSize());
         List<Indicator> indicators = indicatorMapper.selectIndicators(page, user, queryWrapper);
-        int index = (int)((page.getCurrent() - 1) * page.getSize());
-        for (Indicator indicator : indicators){
+        int index = (int) ((page.getCurrent() - 1) * page.getSize());
+        for (Indicator indicator : indicators) {
             indicator.setIndex(++index);
             getIndicatorInfo(indicator);
         }
@@ -106,17 +106,23 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
      */
     @Override
     public List<User> getIndicatorCreators() {
-        return indicatorMapper.selectIndicatorCreators();
+        List<User> users = indicatorMapper.selectIndicatorCreators();
+        for (User user : users){
+            user.setPassword(null);
+            user.setEmail(null);
+        }
+        return users;
     }
 
     /**
      * @description: 获取指标的血缘树结点信息与边信息
-     * @param {String} indicatorId 指标id
-     * @return {Map<String, Object>} 指标血缘树结点信息与边信息 {nodes: [], edges: []} nodes: 结点信息, edges: 边信息
+     * @param indicatorId 指标id
+     * @return {Map<String, Object>} 指标血缘树结点信息与边信息 {nodes: [], edges: []} nodes:
+     *         结点信息, edges: 边信息
      * @author: wch
-     */  
+     */
     @Override
-    public Map<String, Object> getIndicatorTreeById(String indicatorId) throws IllegalArgumentException{
+    public Map<String, Object> getIndicatorTreeById(String indicatorId) throws IllegalArgumentException {
         Indicator sourceIndicator = getById(indicatorId);
         if (sourceIndicator == null)
             throw new IllegalArgumentException("指标" + indicatorId + "不存在");
@@ -129,8 +135,8 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
         sourceIndicator.setIndicatorTypeName(IndicatorUtils.getTypeName(sourceIndicator.getIndicatorType()));
         nodes.add(sourceIndicator);
 
-        //主原子指标
-        if (sourceIndicator.getIndicatorType() == Indicator.TYPE_ATOMIC){
+        // 主原子指标
+        if (sourceIndicator.getIndicatorType() == Indicator.TYPE_ATOMIC) {
             queryWrapper.eq("dependent_indicator_id", indicatorId);
             List<Indicator> derivationModifierIndicators = list(queryWrapper);
             for (Indicator node : derivationModifierIndicators) {
@@ -143,7 +149,7 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
             }
 
             List<String> composites = indicatorMapper.getCompositeIndicatorIdByOtherIndicator(indicatorId);
-            for (String compositeId : composites){
+            for (String compositeId : composites) {
                 Indicator composite = getById(compositeId);
                 composite.setIndicatorTypeName(IndicatorUtils.getTypeName(composite.getIndicatorType()));
                 nodes.add(composite);
@@ -154,10 +160,10 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
             }
         }
 
-        //复合指标
-        else if (sourceIndicator.getIndicatorType() == Indicator.TYPE_COMPOSITE){
+        // 复合指标
+        else if (sourceIndicator.getIndicatorType() == Indicator.TYPE_COMPOSITE) {
             List<String> composites = indicatorMapper.getOtherIndicatorsByCompositeIndicatorId(indicatorId);
-            for (String compositeId : composites){
+            for (String compositeId : composites) {
                 Indicator composite = getById(compositeId);
                 composite.setIndicatorTypeName(IndicatorUtils.getTypeName(composite.getIndicatorType()));
                 nodes.add(composite);
@@ -165,10 +171,19 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
                 edge.put("source", composite.getIndicatorId());
                 edge.put("target", indicatorId);
                 edges.add(edge);
+
+                if (composite.getIndicatorType() != Indicator.TYPE_ATOMIC){
+                    Indicator dependentIndicator = getById(composite.getDependentIndicatorId());
+                    nodes.add(dependentIndicator);
+                    edge = new HashMap<>();
+                    edge.put("source", dependentIndicator.getIndicatorId());
+                    edge.put("target", compositeId);
+                    edges.add(edge);
+                }
             }
         }
 
-        //衍生原子指标与派生指标
+        // 衍生原子指标与派生指标
         else {
             List<String> otherIndicators = indicatorMapper.getCompositeIndicatorIdByOtherIndicator(indicatorId);
             Indicator dependentIndicator = getById(sourceIndicator.getDependentIndicatorId());
@@ -178,7 +193,7 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
             edge.put("source", dependentIndicator.getIndicatorId());
             edge.put("target", indicatorId);
             edges.add(edge);
-            for (String otherIndicatorId : otherIndicators){
+            for (String otherIndicatorId : otherIndicators) {
                 Indicator otherIndicator = getById(otherIndicatorId);
                 otherIndicator.setIndicatorTypeName(IndicatorUtils.getTypeName(otherIndicator.getIndicatorType()));
                 nodes.add(otherIndicator);
@@ -196,11 +211,11 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
 
     /**
      * @description: 按搜索条件查询指标
-     * @param {User} user 请求查询的用户
-     * @param {IndicatorQuery} indicatorQuery 指标查询条件
+     * @param user           请求查询的用户
+     * @param indicatorQuery 指标查询条件
      * @return {List<Indicator>} 指标列表
      * @author: wch
-     */  
+     */
     @Override
     public List<Indicator> getIndicators(User user, IndicatorQuery indicatorQuery) {
         QueryWrapper<Indicator> queryWrapper = getQueryWrapper(indicatorQuery);
@@ -212,18 +227,18 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
 
     /**
      * @description: 分页按搜索条件查询指标
-     * @param {User} user 请求查询的用户
-     * @param {IndicatorQuery} indicatorQuery 指标查询条件
+     * @param user           请求查询的用户
+     * @param indicatorQuery 指标查询条件
      * @return {Page<Indicator>} 指标分页列表
      * @author: wch
-     */ 
+     */
     @Override
     public Page<Indicator> getIndicatorsWithPage(User user, IndicatorQuery indicatorQuery) {
         QueryWrapper<Indicator> queryWrapper = getQueryWrapper(indicatorQuery);
         Page<Indicator> page = new Page<>(indicatorQuery.getPage(), indicatorQuery.getPageSize());
         List<Indicator> indicators = indicatorMapper.selectIndicators(page, user, queryWrapper);
-        int index = (int)((page.getCurrent() - 1) * page.getSize());
-        for (Indicator indicator : indicators){
+        int index = (int) ((page.getCurrent() - 1) * page.getSize());
+        for (Indicator indicator : indicators) {
             indicator.setIndex(++index);
             getIndicatorInfo(indicator);
         }
@@ -233,11 +248,11 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
 
     /**
      * @description: 新增指标
-     * @param {User} user 请求新增指标的用户
-     * @param {Indicator} indicator 新增的指标信息
+     * @param user      请求新增指标的用户
+     * @param indicator 新增的指标信息
      * @return {Boolean} 新增成功则返回true,否则抛出异常
      * @author: wch
-     */ 
+     */
     @Override
     @Transactional
     public Boolean saveIndicator(User user, Indicator indicator) {
@@ -245,22 +260,20 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
         indicator.setLastOperateTime(new Date());
         indicator.setLastOperatorId(user.getUserId());
 
-        //添加衍生词,修饰词,运算指标等信息
+        // 添加衍生词,修饰词,运算指标等信息
         save(indicator);
-        if (indicator.getIndicatorType() == Indicator.TYPE_DERIVATION){
+        if (indicator.getIndicatorType() == Indicator.TYPE_DERIVATION) {
             for (Integer derivation : indicator.getDerivations())
                 indicatorMapper.insertIndicatorDerivation(indicator.getIndicatorId(), derivation);
-        }
-        else if (indicator.getIndicatorType() == Indicator.TYPE_MODIFIER){
+        } else if (indicator.getIndicatorType() == Indicator.TYPE_MODIFIER) {
             for (List<Integer> modifier : indicator.getModifiers())
                 indicatorMapper.insertIndicatorModifier(indicator.getIndicatorId(), modifier.get(1));
-        }
-        else if (indicator.getIndicatorType() == Indicator.TYPE_COMPOSITE){
+        } else if (indicator.getIndicatorType() == Indicator.TYPE_COMPOSITE) {
             for (String composited : indicator.getCompositeds())
                 indicatorMapper.insertCompositeIndicator(indicator.getIndicatorId(), composited);
         }
 
-        //添加指标新版本
+        // 添加指标新版本
         Version version = new Version();
         version.setIndicatorId(indicator.getIndicatorId());
         version.setOperatorId(user.getUserId());
@@ -271,8 +284,8 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
 
     /**
      * @description: 更新指标信息(不包括指标状态)
-     * @param {User} user 请求更新指标的用户
-     * @param {Indicator} indicator 更新的指标信息
+     * @param user      请求更新指标的用户
+     * @param newIndicator 更新的指标信息
      * @return {Boolean} 更新成功则返回true,否则抛出异常
      * @author: wch
      */
@@ -287,27 +300,27 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
 
         sortIndicator(oldIndicator);
         sortIndicator(newIndicator);
-        //比较衍生词,修饰词,运算指标是否有变化
-        if (newIndicator.getIndicatorType() == Indicator.TYPE_DERIVATION && !oldIndicator.getDerivations().equals(newIndicator.getDerivations())){
+        // 比较衍生词,修饰词,运算指标是否有变化
+        if (newIndicator.getIndicatorType() == Indicator.TYPE_DERIVATION
+                && !oldIndicator.getDerivations().equals(newIndicator.getDerivations())) {
             indicatorMapper.deleteIndicatorDerivation(newIndicator.getIndicatorId());
             for (Integer derivation : newIndicator.getDerivations())
                 indicatorMapper.insertIndicatorDerivation(newIndicator.getIndicatorId(), derivation);
-        }
-        else if (newIndicator.getIndicatorType() == Indicator.TYPE_MODIFIER && !oldIndicator.getModifiers().equals(newIndicator.getModifiers())){
+        } else if (newIndicator.getIndicatorType() == Indicator.TYPE_MODIFIER
+                && !oldIndicator.getModifiers().equals(newIndicator.getModifiers())) {
             indicatorMapper.deleteIndicatorModifier(newIndicator.getIndicatorId());
             for (List<Integer> modifier : newIndicator.getModifiers())
                 indicatorMapper.insertIndicatorModifier(newIndicator.getIndicatorId(), modifier.get(1));
-        }
-        else if (newIndicator.getIndicatorType() == Indicator.TYPE_COMPOSITE && !oldIndicator.getCompositeds().equals(newIndicator.getCompositeds())){
+        } else if (newIndicator.getIndicatorType() == Indicator.TYPE_COMPOSITE
+                && !oldIndicator.getCompositeds().equals(newIndicator.getCompositeds())) {
             indicatorMapper.deleteCompositeIndicator(newIndicator.getIndicatorId());
             for (String composited : newIndicator.getCompositeds())
                 indicatorMapper.insertCompositeIndicator(newIndicator.getIndicatorId(), composited);
         }
 
-        //更新指标版本信息
+        // 更新指标版本信息
         Version version = versionService.getVersionInfo(oldIndicator, newIndicator);
         if (version.getOperation() != null && version.getOperation().length() != 0) {
-            version.updateVersion();
             versionService.save(version);
         }
 
@@ -316,12 +329,12 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
 
     /**
      * @description: 更新指标状态
-     * @param {User} user 请求更新指标状态的用户
-     * @param {int} newState 新的指标状态
-     * @param {Indicator} indicator 待更新的指标
+     * @param user      请求更新指标状态的用户
+     * @param newState  新的指标状态
+     * @param indicator 待更新的指标
      * @return {Boolean} 更新成功则返回true,否则抛出异常
      * @author: wch
-     */ 
+     */
     @Override
     @Transactional
     public Boolean updateIndicatorState(User user, int newState, Indicator indicator) {
@@ -345,14 +358,39 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
     }
 
     /**
+     * @description: 删除指标
+     * @param indicator 待删除的指标id
+     * @return {*}
+     * @author wch
+     */
+    @Override
+    @Transactional
+    public void removeIndicator(Indicator indicator) throws IllegalArgumentException{
+        getIndicatorInfo(indicator);
+        if (indicator.getQuoteNum() > 0)
+            throw new IllegalArgumentException("被引用的指标不为0,不可删除");
+        if (indicator.getIndicatorType() == Indicator.TYPE_DERIVATION){
+            indicatorMapper.deleteIndicatorDerivation(indicator.getIndicatorId());
+        } else if (indicator.getIndicatorType() == Indicator.TYPE_MODIFIER) {
+            indicatorMapper.deleteIndicatorModifier(indicator.getIndicatorId());
+        } else if (indicator.getIndicatorType() == Indicator.TYPE_COMPOSITE) {
+            indicatorMapper.deleteCompositeIndicator(indicator.getIndicatorId());
+        }
+        QueryWrapper<Version> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("indicator_id", indicator.getIndicatorId());
+        versionService.remove(queryWrapper);
+        removeById(indicator);
+    }
+
+    /**
      * @description: 验证指标中的信息是否合法
-     * @param {Indicator} indicator 待验证的指标
+     * @param indicator 待验证的指标
      * @return {Boolean} 验证成功则返回true,否则抛出异常
      * @throws {IllegalArgumentException} 参数异常
      * @author: wch
-     */   
+     */
     @Override
-    public Boolean verifyIndicator(Indicator indicator) throws IllegalArgumentException{
+    public Boolean verifyIndicator(Indicator indicator) throws IllegalArgumentException {
         if (indicator.getIndicatorId() == null || indicator.getIndicatorId().length() == 0)
             throw new IllegalArgumentException("指标标识不能为空");
 
@@ -375,7 +413,8 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
                 && indicator.getDependentIndicatorId() == null)
             throw new IllegalArgumentException("依赖的主原子指标标识不能为空");
 
-        if ((indicator.getIndicatorType() == Indicator.TYPE_DERIVATION || indicator.getIndicatorType() == Indicator.TYPE_MODIFIER)
+        if ((indicator.getIndicatorType() == Indicator.TYPE_DERIVATION
+                || indicator.getIndicatorType() == Indicator.TYPE_MODIFIER)
                 && getById(indicator.getDependentIndicatorId()).getIndicatorType() != Indicator.TYPE_ATOMIC)
             throw new IllegalArgumentException("依赖的主原子指标不存在");
 
@@ -443,8 +482,8 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
                 && (indicator.getModifiers() != null && indicator.getModifiers().size() != 0))
             throw new IllegalArgumentException("非派生指标不能添加修饰词");
 
-         if (indicator.getIndicatorType() == Indicator.TYPE_MODIFIER &&
-            (indicator.getModifiers() == null || indicator.getModifiers().size() == 0))
+        if (indicator.getIndicatorType() == Indicator.TYPE_MODIFIER &&
+                (indicator.getModifiers() == null || indicator.getModifiers().size() == 0))
             throw new IllegalArgumentException("修饰词不能为空");
 
         if (indicator.getIndicatorType() == Indicator.TYPE_MODIFIER
@@ -488,20 +527,18 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
         if (indicator.getCompetentAuthoritie() != null && indicator.getCompetentAuthoritie().length() == 0)
             indicator.setCompetentAuthoritie(null);
 
-        if (indicator.getDerivations() != null){
-            for (Integer derivation : indicator.getDerivations()){
+        if (indicator.getDerivations() != null) {
+            for (Integer derivation : indicator.getDerivations()) {
                 if (derivationService.getById(derivation) == null)
                     throw new IllegalArgumentException("衍生词" + derivation + "不存在");
             }
-        }
-        else if (indicator.getModifiers() != null){
-            for (List<Integer> modifier : indicator.getModifiers()){
+        } else if (indicator.getModifiers() != null) {
+            for (List<Integer> modifier : indicator.getModifiers()) {
                 if (modifierService.getById(modifier.get(1)) == null)
                     throw new IllegalArgumentException("修饰词" + modifier.get(1) + "不存在");
             }
-        }
-        else if (indicator.getCompositeds() != null){
-            for (String compositeds : indicator.getCompositeds()){
+        } else if (indicator.getCompositeds() != null) {
+            for (String compositeds : indicator.getCompositeds()) {
                 if (getById(compositeds) == null)
                     throw new IllegalArgumentException("指标" + compositeds + "不存在");
             }
@@ -512,37 +549,42 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
 
     /**
      * @description: 获取指标完整信息(指标域名称,指标类型名称,指标状态名称等)
-     * @param {Indicator} indicator 指标对象
+     * @param indicator 指标对象
      * @return {*}
      * @author: wch
-     */    
-    private void getIndicatorInfo(Indicator indicator){
+     */
+    private void getIndicatorInfo(Indicator indicator) {
         indicator.getInfo();
-        if (indicator.getIndicatorType() == 2){
+        if (indicator.getIndicatorType() == Indicator.TYPE_ATOMIC){
+            indicator.setQuoteNum((int) (query().eq("dependent_indicator_id", indicator.getIndicatorId()).count() - 0));
+            indicator.setQuoteNum(indicator.getQuoteNum() + indicatorMapper.getCompositeIndicatorIdByOtherIndicator(indicator.getIndicatorId()).size());
+        } else if (indicator.getIndicatorType() == Indicator.TYPE_DERIVATION) {
             indicator.setDerivations(new ArrayList<>());
             indicator.setDerivationNames(new ArrayList<>());
+            indicator.setQuoteNum(indicatorMapper.getCompositeIndicatorIdByOtherIndicator(indicator.getIndicatorId()).size());
             List<Integer> derivationIds = indicatorMapper.getIndicatorDerivations(indicator.getIndicatorId());
-            for (Integer derivationId: derivationIds) {
+            for (Integer derivationId : derivationIds) {
                 indicator.getDerivations().add(derivationId);
                 indicator.getDerivationNames().add(derivationService.getById(derivationId).getDerivationName());
             }
-        }
-        else if (indicator.getIndicatorType() == 3){
+        } else if (indicator.getIndicatorType() == Indicator.TYPE_MODIFIER) {
             indicator.setModifiers(new ArrayList<>());
             indicator.setModifierNames(new ArrayList<>());
+            indicator.setQuoteNum(indicatorMapper.getCompositeIndicatorIdByOtherIndicator(indicator.getIndicatorId()).size());
             List<Integer> modifierIds = indicatorMapper.getIndicatorModifiers(indicator.getIndicatorId());
-            for (Integer modifierId: modifierIds) {
+            for (Integer modifierId : modifierIds) {
                 List<Integer> modifier = new ArrayList<>();
                 modifier.add(modifierService.getById(modifierId).getParentModifierId());
                 modifier.add(modifierId);
                 indicator.getModifiers().add(modifier);
                 indicator.getModifierNames().add(modifierService.getById(modifierId).getModifierName());
             }
-        }
-        else if (indicator.getIndicatorType() == 4){
+        } else if (indicator.getIndicatorType() == Indicator.TYPE_COMPOSITE) {
             indicator.setCompositeds(new ArrayList<>());
             indicator.setCompositedNames(new ArrayList<>());
-            List<String> compositedIds = indicatorMapper.getOtherIndicatorsByCompositeIndicatorId(indicator.getIndicatorId());
+            indicator.setQuoteNum(0);
+            List<String> compositedIds = indicatorMapper
+                    .getOtherIndicatorsByCompositeIndicatorId(indicator.getIndicatorId());
             for (String compositedId : compositedIds) {
                 indicator.getCompositeds().add(compositedId);
                 indicator.getCompositedNames().add(getById(compositedId).getIndicatorName());
@@ -552,11 +594,11 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
 
     /**
      * @description: 根据传入的搜索条件构造数据库查询条件
-     * @param {IndicatorQuery} indicatorQuery 指标搜索条件
+     * @param indicatorQuery 指标搜索条件
      * @return {QueryWrapper<Indicator>} 数据库查询条件对象QueryWrapper<Indicator>
      * @author: wch
-     */    
-    private QueryWrapper<Indicator> getQueryWrapper(IndicatorQuery indicatorQuery){
+     */
+    private QueryWrapper<Indicator> getQueryWrapper(IndicatorQuery indicatorQuery) {
         QueryWrapper<Indicator> queryWrapper = new QueryWrapper<>();
         if (indicatorQuery.getIndicatorType() != null)
             queryWrapper.eq("i.indicator_type", indicatorQuery.getIndicatorType());
@@ -573,7 +615,7 @@ public class IndicatorServiceImpl extends ServiceImpl<IndicatorMapper, Indicator
 
     /**
      * @description: 对指标的衍生词,修饰词,运算指标按id从小到大进行排序
-     * @param {Indicator} indicator 待排序指标对象
+     * @param indicator 待排序指标对象
      * @return {*}
      * @author: wch
      */

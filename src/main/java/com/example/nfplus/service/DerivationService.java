@@ -4,7 +4,7 @@
  * @email: 1301457114@qq.com
  * @Date: 2023-07-29 18:16:58
  * @LastEditors: wch
- * @LastEditTime: 2023-08-15 10:47:53
+ * @LastEditTime: 2023-08-15 14:42:26
  */
 
 package com.example.nfplus.service;
@@ -23,7 +23,7 @@ import java.util.List;
 public interface DerivationService extends IService<Derivation> {
     /**
      * @description: 查询引用该衍生词的指标列表
-     * @param {int} derivationId 衍生词id
+     * @param derivationId 衍生词id
      * @return {List<Indicator>} 指标列表
      * @author: wch
      */
@@ -31,8 +31,8 @@ public interface DerivationService extends IService<Derivation> {
 
     /**
      * @description: 按搜索条件查询衍生词
-     * @param {User}       user 请求查询的用户
-     * @param {WordsQuery} wordsQuery 搜索条件
+     * @param user 请求查询的用户
+     * @param wordsQuery 搜索条件
      * @return {List<Derivation>} 衍生词列表
      * @author: wch
      */
@@ -40,8 +40,8 @@ public interface DerivationService extends IService<Derivation> {
 
     /**
      * @description: 按搜索条件分页查询衍生词
-     * @param {User}       user 请求查询的用户
-     * @param {WordsQuery} wordsQuery 搜索条件
+     * @param user 请求查询的用户
+     * @param wordsQuery 搜索条件
      * @return {Page<Derivation>} 衍生词分页列表
      * @author: wch
      */

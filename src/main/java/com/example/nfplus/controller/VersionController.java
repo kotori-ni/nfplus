@@ -4,9 +4,8 @@
  * @email: 1301457114@qq.com
  * @Date: 2023-08-02 23:16:40
  * @LastEditors: wch
- * @LastEditTime: 2023-08-14 16:31:19
+ * @LastEditTime: 2023-08-15 14:36:30
  */
-
 
 package com.example.nfplus.controller;
 
@@ -27,17 +26,18 @@ public class VersionController {
 
     /**
      * @description: 获取指标的所有版本
-     * @param {String} token 用户token
-     * @param {String} indicatorId 指标id
+     * @param token       用户token
+     * @param indicatorId 指标id
      * @return {ResultUtils}
      * @author: wch
-     */    
+     */
     @GetMapping("/all")
-    public ResultUtils getIndicatorVersion(@RequestHeader("Authorization") String token, @RequestParam String indicatorId){
+    public ResultUtils getIndicatorVersion(@RequestHeader("Authorization") String token,
+            @RequestParam String indicatorId) {
         User user = userService.findUserByToken(token);
-        try{
+        try {
             return ResultUtils.ok().data("versions", versionService.getIndicatorVersions(user, indicatorId));
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ResultUtils.error().message("获取指标版本失败");
         }

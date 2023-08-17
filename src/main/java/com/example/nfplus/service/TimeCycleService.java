@@ -4,7 +4,7 @@
  * @email: 1301457114@qq.com
  * @Date: 2023-07-29 18:17:57
  * @LastEditors: wch
- * @LastEditTime: 2023-08-15 14:05:51
+ * @LastEditTime: 2023-08-15 14:44:56
  */
 package com.example.nfplus.service;
 
@@ -22,6 +22,7 @@ import java.util.List;
 public interface TimeCycleService extends IService<TimeCycle> {
     /**
      * @description: 查找引用该时间周期的指标列表
+     * @param timeCycleId 时间周期id
      * @return {List<Indicator>} 指标列表
      * @author: wch
      */    
@@ -29,6 +30,8 @@ public interface TimeCycleService extends IService<TimeCycle> {
 
     /**
      * @description: 按搜索条件查找时间周期
+     * @param user 请求查询的用户
+     * @param wordsQuery 搜索条件
      * @return {List<TimeCycle>} 时间周期列表
      * @author: wch
      */    
@@ -36,6 +39,8 @@ public interface TimeCycleService extends IService<TimeCycle> {
 
     /**
      * @description: 按搜索条件分页查找时间周期
+     * @param user 请求查询的用户
+     * @param wordsQuery 搜索条件
      * @return {Page<TimeCycle>} 时间周期分页列表
      * @author: wch
      */    

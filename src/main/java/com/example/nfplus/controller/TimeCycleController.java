@@ -4,7 +4,7 @@
  * @email: 1301457114@qq.com
  * @Date: 2023-07-30 20:32:33
  * @LastEditors: wch
- * @LastEditTime: 2023-08-14 16:23:25
+ * @LastEditTime: 2023-08-16 10:12:48
  */
 
 
@@ -52,8 +52,8 @@ public class TimeCycleController {
 
     /**
      * @description: 按条件获取所有时间周期
-     * @param {String} token 用户token
-     * @param {WordQuery} wordsQuery 查询条件
+     * @param token 用户token
+     * @param wordsQuery 查询条件
      * @return {ResultUtils}
      * @author: wch
      */    
@@ -78,8 +78,8 @@ public class TimeCycleController {
 
     /**
      * @description: 获取引用该时间周期的指标列表
-     * @param {String} token 用户token
-     * @param {int} timeCycleId 时间周期id
+     * @param token 用户token
+     * @param timeCycleId 时间周期id
      * @return {ResultUtils}
      * @author: wch
      */    
@@ -97,8 +97,8 @@ public class TimeCycleController {
 
     /**
      * @description: 新增时间周期
-     * @param {String} token 用户token
-     * @param {TimeCycle} timeCycle 时间周期
+     * @param token 用户token
+     * @param timeCycle 时间周期
      * @return {ResultUtils}
      * @author: wch
      */    
@@ -109,8 +109,7 @@ public class TimeCycleController {
         timeCycle.setCreatorId(user.getUserId());
         if (timeCycle.getTimeCycleName() == null)
             return ResultUtils.error().message("缺少时间周期名称");
-        TimeCycle existTimeCycle = timeCycleService.query().eq("time_cycle_name", timeCycle.getTimeCycleName()).one();
-        if (existTimeCycle != null)
+        if (timeCycleService.query().eq("time_cycle_name", timeCycle.getTimeCycleName()).count() > 0)
             return ResultUtils.error().message("时间周期名称重复");
         if (timeCycleService.save(timeCycle))
             return ResultUtils.ok().message("添加时间周期成功");
@@ -119,8 +118,8 @@ public class TimeCycleController {
 
     /**
      * @description: 批量添加事件周期
-     * @param {String} token 用户token
-     * @param {List<TimeCycle>} timeCycles 时间周期列表
+     * @param token 用户token
+     * @param timeCycles 时间周期列表
      * @return {ResultUtils}
      * @author: wch
      */    
@@ -159,8 +158,8 @@ public class TimeCycleController {
 
     /**
      * @description: 更新时间周期信息
-     * @param {String} token 用户token
-     * @param {TimeCycle} timeCycle 时间周期
+     * @param token 用户token
+     * @param timeCycle 时间周期
      * @return {ResultUtils}
      * @author: wch
      */    
@@ -184,21 +183,25 @@ public class TimeCycleController {
 
     /**
      * @description: 删除时间周期(该接口未使用)
-     * @param {String} token 用户token
-     * @param {int} timeCycleId 时间周期id
+     * @param token 用户token
+     * @param timeCycleId 时间周期id
      * @return {ResultUtils}
      * @author: wch
      */    
-    @PostMapping
+    @DeleteMapping("delete")
     public ResultUtils deleteTimeCycle(@RequestHeader("Authorization") String token, @RequestParam int timeCycleId){
-        User user = userService.findUserByToken(token);
         TimeCycle timeCycle = timeCycleService.getById(timeCycleId);
         if (timeCycle == null)
             return ResultUtils.error().message("时间周期不存在");
-        if (timeCycle.getCreatorId().intValue() != user.getUserId().intValue())
-            return ResultUtils.error().message("没有权限删除该时间周期");
-        if (timeCycleService.removeById(timeCycleId))
+        int quoteNum = timeCycleMapper.selectQuoteIndicatorNum(timeCycleId);
+        if (quoteNum > 0)
+            return ResultUtils.error().message("有 " + quoteNum + " 个指标引用了该时间周期,不可删除");
+        try{
+            timeCycleService.removeById(timeCycleId);
             return ResultUtils.ok().message("删除时间周期成功");
-        return ResultUtils.error().message("删除时间周期失败");
+        } catch (Exception e){
+            e.printStackTrace();
+            return ResultUtils.error().message("删除时间周期失败");
+        }
     }
 }

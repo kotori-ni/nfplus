@@ -4,7 +4,7 @@
  * @email: 1301457114@qq.com
  * @Date: 2023-07-29 18:13:10
  * @LastEditors: wch
- * @LastEditTime: 2023-08-15 10:32:52
+ * @LastEditTime: 2023-08-15 14:41:55
  */
 
 package com.example.nfplus.mapper;
@@ -21,7 +21,7 @@ import java.util.List;
 public interface VersionMapper extends BaseMapper<Version> {
 	/**
 	 * @description: 查询指标的最新版本
-	 * @param {String} id 指标id
+	 * @param id 指标id
 	 * @return {Version} 最新版本信息
 	 * @author: wch
 	 */
@@ -30,7 +30,7 @@ public interface VersionMapper extends BaseMapper<Version> {
 
 	/**
 	 * @description: 按搜索条件查询指标的版本信息
-	 * @param {QueryWrapper<Version>} queryWrapper 查询条件
+	 * @param queryWrapper 查询条件
 	 * @return {List<Version>} 指标版本信息列表
 	 * @author: wch
 	 */

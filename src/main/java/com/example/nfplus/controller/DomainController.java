@@ -4,7 +4,7 @@
  * @email: 1301457114@qq.com
  * @Date: 2023-07-29 16:19:46
  * @LastEditors: wch
- * @LastEditTime: 2023-08-14 16:00:20
+ * @LastEditTime: 2023-08-16 10:19:06
  */
 
 
@@ -28,8 +28,8 @@ public class DomainController {
 
     /**
      * @description: 获取所有指标域(树形结构)
-     * @param {Boolean} needAll 是否需要"全部"这个结点
-     * @param {Boolean} allowParent 父指标域是否允许被选中
+     * @param needAll 是否需要"全部"这个结点
+     * @param allowParent 父指标域是否允许被选中
      * @return {ResultUtils}
      * @author: wch
      */    
@@ -45,7 +45,7 @@ public class DomainController {
 
     /**
      * @description: 获取指标域的所有子指标域(树形结构)
-     * @param {int} domainId 指标域id
+     * @param domainId 指标域id
      * @return {ResultUtils}
      */
     @GetMapping("/child")
@@ -62,7 +62,7 @@ public class DomainController {
 
     /**
      * @description: 获取指标域中的所有指标
-     * @param {int} domainId 指标域id
+     * @param domainId 指标域id
      * @return {ResultUtils}
      * @author: wch
      */    
@@ -80,15 +80,15 @@ public class DomainController {
 
     /**
      * @description: 新增指标域
-     * @param {String} token 用户token
-     * @param {Domain} domain 指标域信息
+     * @param token 用户token
+     * @param domain 指标域信息
      * @return {ResultUtils}
      * @Author: wch
      */
     @PostMapping("/add")
     public ResultUtils addDomain(@RequestHeader("Authorization") String token, @RequestBody Domain domain){
         User creator = userService.findUserByToken(token);
-        Domain existDomain = domainService.query().eq("domain_name", domain.getDomainName()).one();
+        Domain existDomain = domainService.findDomainByName(domain.getDomainName());
         if (existDomain != null && domain.getParentDomainId() == existDomain.getParentDomainId())
             return ResultUtils.error().message("指标域名重复");
         if (domain.getParentDomainId() != null && domainService.findQuoteIndicators(domain.getParentDomainId()).size() != 0)
@@ -110,8 +110,8 @@ public class DomainController {
 
     /**
      * @description: 修改指标域信息
-     * @param {String} token 用户token
-     * @param {Domain} domain 指标域信息
+     * @param token 用户token
+     * @param domain 指标域信息
      * @return {ResultUtils}
      * @author: wch
      */    
@@ -135,8 +135,8 @@ public class DomainController {
 
     /**
      * @description: 删除指标域
-     * @param {String} token 用户token
-     * @param {int} domainId 指标域id
+     * @param token 用户token
+     * @param domainId 指标域id
      * @return {ResultUtils}
      * @author: wch
      */    

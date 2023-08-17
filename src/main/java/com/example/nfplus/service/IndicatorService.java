@@ -4,7 +4,7 @@
  * @email: 1301457114@qq.com
  * @Date: 2023-07-29 15:36:05
  * @LastEditors: wch
- * @LastEditTime: 2023-08-15 11:17:14
+ * @LastEditTime: 2023-08-15 14:43:30
  */
 package com.example.nfplus.service;
 
@@ -22,8 +22,8 @@ import java.util.Map;
 public interface IndicatorService extends IService<Indicator> {
     /**
      * @description: 获取指标详细信息
-     * @param {User} user 请求查询指标的用户
-     * @param {String} indicatorId 指标id
+     * @param user 请求查询指标的用户
+     * @param indicatorId 指标id
      * @return {Indicator} 指标信息
      * @author: wch
      */    
@@ -38,7 +38,7 @@ public interface IndicatorService extends IService<Indicator> {
 
     /**
      * @description: 获取用户收藏的所有指标
-     * @param {User} user 请求查询的用户
+     * @param user 请求查询的用户
      * @return {List<Indicator>} 指标列表
      * @author: wch
      */    
@@ -46,8 +46,8 @@ public interface IndicatorService extends IService<Indicator> {
 
     /**
      * @description: 分页按搜索条件获取用户收藏的指标
-     * @param {User} user 请求查询的用户
-     * @param {IndicatorQuery} indicatorQuery 分页查询条件
+     * @param user 请求查询的用户
+     * @param indicatorQuery 分页查询条件
      * @return {Page<Indicator>} 指标分页列表
      * @author: wch
      */    
@@ -62,7 +62,7 @@ public interface IndicatorService extends IService<Indicator> {
 
     /**
      * @description: 获取指标的血缘树结点信息与边信息
-     * @param {String} indicatorId 指标id
+     * @param indicatorId 指标id
      * @return {Map<String, Object>} 指标血缘树结点信息与边信息 {nodes: [], edges: []} nodes: 结点信息, edges: 边信息
      * @author: wch
      */    
@@ -70,8 +70,8 @@ public interface IndicatorService extends IService<Indicator> {
 
     /**
      * @description: 按搜索条件查询指标
-     * @param {User} user 请求查询的用户
-     * @param {IndicatorQuery} indicatorQuery 指标查询条件
+     * @param user 请求查询的用户
+     * @param indicatorQuery 指标查询条件
      * @return {List<Indicator>} 指标列表
      * @author: wch
      */    
@@ -79,8 +79,8 @@ public interface IndicatorService extends IService<Indicator> {
 
     /**
      * @description: 分页按搜索条件查询指标
-     * @param {User} user 请求查询的用户
-     * @param {IndicatorQuery} indicatorQuery 指标查询条件
+     * @param user 请求查询的用户
+     * @param indicatorQuery 指标查询条件
      * @return {Page<Indicator>} 指标分页列表
      * @author: wch
      */    
@@ -88,8 +88,8 @@ public interface IndicatorService extends IService<Indicator> {
 
     /**
      * @description: 新增指标
-     * @param {User} user 请求新增指标的用户
-     * @param {Indicator} indicator 新增的指标信息
+     * @param user 请求新增指标的用户
+     * @param indicator 新增的指标信息
      * @return {Boolean} 新增成功则返回true,否则抛出异常
      * @author: wch
      */    
@@ -97,8 +97,8 @@ public interface IndicatorService extends IService<Indicator> {
 
     /**
      * @description: 更新指标信息(不包括指标状态)
-     * @param {User} user 请求更新指标的用户
-     * @param {Indicator} indicator 更新的指标信息
+     * @param user 请求更新指标的用户
+     * @param indicator 更新的指标信息
      * @return {Boolean} 更新成功则返回true,否则抛出异常
      * @author: wch
      */
@@ -106,17 +106,25 @@ public interface IndicatorService extends IService<Indicator> {
 
     /**
      * @description: 更新指标状态
-     * @param {User} user 请求更新指标状态的用户
-     * @param {int} newState 新的指标状态
-     * @param {Indicator} indicator 待更新的指标
+     * @param user 请求更新指标状态的用户
+     * @param newState 新的指标状态
+     * @param indicator 待更新的指标
      * @return {Boolean} 更新成功则返回true,否则抛出异常
      * @author: wch
      */    
     public Boolean updateIndicatorState(User user, int newState, Indicator indicator);
 
     /**
+     * @description: 删除指标
+     * @param indicator 待删除的指标id
+     * @return {*}
+     * @author wch
+     */
+    public void removeIndicator(Indicator indicator);
+
+    /**
      * @description: 验证指标中的信息是否合法
-     * @param {Indicator} indicator 待验证的指标
+     * @param indicator 待验证的指标
      * @return {Boolean} 验证成功则返回true,否则抛出异常
      * @author: wch
      */    

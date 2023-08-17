@@ -4,7 +4,7 @@
  * @email: 1301457114@qq.com
  * @Date: 2023-07-29 20:57:46
  * @LastEditors: wch
- * @LastEditTime: 2023-08-15 10:49:27
+ * @LastEditTime: 2023-08-15 14:46:37
  */
 package com.example.nfplus.serviceImpl;
 
@@ -32,7 +32,7 @@ public class DerivationServiceImpl extends ServiceImpl<DerivationMapper, Derivat
 
     /**
      * @description: 查询引用该衍生词的指标列表
-     * @param {int} derivationId 衍生词id
+     * @param derivationId 衍生词id
      * @return {List<Indicator>} 指标列表
      * @author: wch
      */
@@ -46,8 +46,8 @@ public class DerivationServiceImpl extends ServiceImpl<DerivationMapper, Derivat
 
     /**
      * @description: 按搜索条件查询衍生词
-     * @param {User}       user 请求查询的用户
-     * @param {WordsQuery} wordsQuery 搜索条件
+     * @param user       请求查询的用户
+     * @param wordsQuery 搜索条件
      * @return {List<Derivation>} 衍生词列表
      * @author: wch
      */
@@ -59,8 +59,8 @@ public class DerivationServiceImpl extends ServiceImpl<DerivationMapper, Derivat
 
     /**
      * @description: 按搜索条件分页查询衍生词
-     * @param {User}       user 请求查询的用户
-     * @param {WordsQuery} wordsQuery 搜索条件
+     * @param user       请求查询的用户
+     * @param wordsQuery 搜索条件
      * @return {Page<Derivation>} 衍生词分页列表
      * @author: wch
      */
@@ -69,7 +69,7 @@ public class DerivationServiceImpl extends ServiceImpl<DerivationMapper, Derivat
         QueryWrapper<Derivation> queryWrapper = getQueryWrapper(wordsQuery);
         Page<Derivation> page = new Page<>(wordsQuery.getPage(), wordsQuery.getPageSize());
         List<Derivation> derivations = derivationMapper.selectDerivations(page, user, queryWrapper);
-        int index = (int)((page.getCurrent() - 1) * page.getSize());
+        int index = (int) ((page.getCurrent() - 1) * page.getSize());
         for (Derivation derivation : derivations)
             derivation.setIndex(++index);
         page.setRecords(derivations);
@@ -78,18 +78,21 @@ public class DerivationServiceImpl extends ServiceImpl<DerivationMapper, Derivat
 
     /**
      * @description: 根据搜索条件构造查询条件
-     * @param {WordsQuery} wordsQuery 搜索条件
+     * @param wordsQuery 搜索条件
      * @return {QueryWrapper<Derivation>} 查询条件包装类对象
      * @author: wch
-     */    
-    private QueryWrapper<Derivation> getQueryWrapper(WordsQuery wordsQuery){
+     */
+    private QueryWrapper<Derivation> getQueryWrapper(WordsQuery wordsQuery) {
         QueryWrapper<Derivation> queryWrapper = new QueryWrapper<>();
         if (wordsQuery.getSort() != null && wordsQuery.getKeyword() != null) {
-            queryWrapper.like(wordsQuery.getSort().equals("all") || wordsQuery.getSort().equals("derivationName"), "derivation_name", wordsQuery.getKeyword());
+            queryWrapper.like(wordsQuery.getSort().equals("all") || wordsQuery.getSort().equals("derivationName"),
+                    "derivation_name", wordsQuery.getKeyword());
             queryWrapper.or();
-            queryWrapper.like(wordsQuery.getSort().equals("all") || wordsQuery.getSort().equals("calculationCaliber"), "calculation_caliber", wordsQuery.getKeyword());
+            queryWrapper.like(wordsQuery.getSort().equals("all") || wordsQuery.getSort().equals("calculationCaliber"),
+                    "calculation_caliber", wordsQuery.getKeyword());
             queryWrapper.or();
-            queryWrapper.like(wordsQuery.getSort().equals("all") || wordsQuery.getSort().equals("creator"), "username", wordsQuery.getKeyword());
+            queryWrapper.like(wordsQuery.getSort().equals("all") || wordsQuery.getSort().equals("creator"), "username",
+                    wordsQuery.getKeyword());
         }
         return queryWrapper;
     }

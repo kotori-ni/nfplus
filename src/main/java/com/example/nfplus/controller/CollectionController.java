@@ -4,7 +4,7 @@
  * @email: 1301457114@qq.com
  * @Date: 2023-07-29 21:07:41
  * @LastEditors: wch
- * @LastEditTime: 2023-08-14 16:03:51
+ * @LastEditTime: 2023-08-15 14:30:35
  */
 
 package com.example.nfplus.controller;
@@ -27,24 +27,24 @@ public class CollectionController {
 
     /**
      * @description: 添加收藏
-     * @param {String} token 用户token
-     * @param {Collection} collection
+     * @param token      用户token
+     * @param collection 待添加的收藏信息
      * @return ResultUtils
      * @author: wch
-     */    
+     */
     @PostMapping("/add")
-    public ResultUtils addCollection(@RequestHeader("Authorization") String token, @RequestBody Collection collection){
-        try{
+    public ResultUtils addCollection(@RequestHeader("Authorization") String token, @RequestBody Collection collection) {
+        try {
             User user = userService.findUserByToken(token);
             collection.setUserId(user.getUserId());
             collectionService.verifyCollection(collection);
             if (collectionService.save(collection))
                 return ResultUtils.ok().message("添加收藏成功");
             return ResultUtils.error().message("添加收藏失败");
-        } catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             e.printStackTrace();
             return ResultUtils.error().message(e.getMessage());
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ResultUtils.error().message("添加收藏失败");
         }
@@ -52,24 +52,25 @@ public class CollectionController {
 
     /**
      * @description: 删除收藏
-     * @param {token} token 用户token
-     * @param {Collection} collection 
+     * @param token      用户token
+     * @param collection
      * @return ResultUtils
      * @author: wch
-     */    
-    @PostMapping("delete")
-    public ResultUtils deleteCollection(@RequestHeader("Authorization") String token, @RequestBody Collection collection){
-        try{
+     */
+    @DeleteMapping("delete")
+    public ResultUtils deleteCollection(@RequestHeader("Authorization") String token,
+            @RequestBody Collection collection) {
+        try {
             User user = userService.findUserByToken(token);
             collection.setUserId(user.getUserId());
             collectionService.verifyCollection(collection);
             if (collectionService.removeCollection(collection))
                 return ResultUtils.ok().message("取消收藏成功");
             return ResultUtils.error().message("取消收藏失败");
-        } catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             e.printStackTrace();
             return ResultUtils.error().message(e.getMessage());
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ResultUtils.error().message("取消收藏失败");
         }

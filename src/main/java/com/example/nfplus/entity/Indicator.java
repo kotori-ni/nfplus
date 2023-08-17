@@ -58,6 +58,9 @@ public class Indicator implements Comparable<Indicator>{
     private Integer favoursNum;                 //收藏次数
 
     @TableField(exist = false)
+    private Integer quoteNum;                   //被引用的次数
+
+    @TableField(exist = false)
     private String indicatorTypeName;           //指标类型名称
 
     @TableField(exist = false)

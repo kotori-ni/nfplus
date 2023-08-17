@@ -4,7 +4,7 @@
  * @email: 1301457114@qq.com
  * @Date: 2023-07-29 15:37:47
  * @LastEditors: wch
- * @LastEditTime: 2023-08-15 09:36:16
+ * @LastEditTime: 2023-08-15 14:37:52
  */
 
 package com.example.nfplus.mapper;
@@ -36,7 +36,7 @@ public interface DomainMapper extends BaseMapper<Domain> {
 
 	/**
 	 * @description: 获取指标域中的所有指标
-	 * @param {int} id 指标域id
+	 * @param id 指标域id
 	 * @return {List<Indicator>} 指标列表
 	 * @author: wch
 	 */
@@ -45,7 +45,7 @@ public interface DomainMapper extends BaseMapper<Domain> {
 
 	/**
 	 * @description: 获取指标域中的指标数量
-	 * @param {int} id 指标域id
+	 * @param id 指标域id
 	 * @return {Integer} 指标数量信息
 	 * @author: wch
 	 */
@@ -54,7 +54,7 @@ public interface DomainMapper extends BaseMapper<Domain> {
 
 	/**
 	 * @description: 获取指标域中的子指标域数量
-	 * @param {int} id 指标域id
+	 * @param id 指标域id
 	 * @return {Integer} 子指标域数量信息
 	 * @author: wch
 	 */

@@ -4,7 +4,7 @@
  * @email: 1301457114@qq.com
  * @Date: 2023-07-29 20:59:25
  * @LastEditors: wch
- * @LastEditTime: 2023-08-15 14:20:37
+ * @LastEditTime: 2023-08-15 14:50:07
  */
 package com.example.nfplus.serviceImpl;
 
@@ -29,9 +29,10 @@ public class TimeCycleServiceImpl extends ServiceImpl<TimeCycleMapper, TimeCycle
 
     /**
      * @description: 查找引用该时间周期的指标列表
+     * @param timeCycleId 时间周期id
      * @return {List<Indicator>} 指标列表
      * @author: wch
-     */    
+     */
     @Override
     public List<Indicator> findQuoteIndicators(int timeCycleId) {
         return timeCycleMapper.selectQuoteIndicators(timeCycleId);
@@ -39,9 +40,11 @@ public class TimeCycleServiceImpl extends ServiceImpl<TimeCycleMapper, TimeCycle
 
     /**
      * @description: 按搜索条件查找时间周期
+     * @param user       请求查询的用户
+     * @param wordsQuery 搜索条件
      * @return {List<TimeCycle>} 时间周期列表
      * @author: wch
-     */    
+     */
     @Override
     public List<TimeCycle> getTimeCycles(User user, WordsQuery wordsQuery) {
         QueryWrapper<TimeCycle> queryWrapper = getQueryWrapper(wordsQuery);
@@ -50,15 +53,17 @@ public class TimeCycleServiceImpl extends ServiceImpl<TimeCycleMapper, TimeCycle
 
     /**
      * @description: 按搜索条件分页查找时间周期
+     * @param user       请求查询的用户
+     * @param wordsQuery 搜索条件
      * @return {Page<TimeCycle>} 时间周期分页列表
      * @author: wch
-     */ 
+     */
     @Override
     public Page<TimeCycle> getTimeCyclesWithPage(User user, WordsQuery wordsQuery) {
         QueryWrapper<TimeCycle> queryWrapper = getQueryWrapper(wordsQuery);
         Page<TimeCycle> page = new Page<>(wordsQuery.getPage(), wordsQuery.getPageSize());
         List<TimeCycle> timeCycles = timeCycleMapper.selectTimeCycles(page, user, queryWrapper);
-        int index = (int)((page.getCurrent() - 1) * page.getSize());
+        int index = (int) ((page.getCurrent() - 1) * page.getSize());
         for (TimeCycle timeCycle : timeCycles)
             timeCycle.setIndex(++index);
         page.setRecords(timeCycles);
@@ -67,16 +72,18 @@ public class TimeCycleServiceImpl extends ServiceImpl<TimeCycleMapper, TimeCycle
 
     /**
      * @description: 根据搜索条件构造数据库查询条件
-     * @param {WordsQuery} wordsQuery 搜索条件
+     * @param wordsQuery 搜索条件
      * @return {QueryWrapper<TimeCycle>} 数据库查询条件对象
      * @author: wch
-     */    
-    public QueryWrapper<TimeCycle> getQueryWrapper(WordsQuery wordsQuery){
+     */
+    public QueryWrapper<TimeCycle> getQueryWrapper(WordsQuery wordsQuery) {
         QueryWrapper<TimeCycle> queryWrapper = new QueryWrapper<>();
         if (wordsQuery.getSort() != null && wordsQuery.getKeyword() != null) {
-            queryWrapper.like(wordsQuery.getSort().equals("all") || wordsQuery.getSort().equals("timeCycleName"), "time_cycle_name", wordsQuery.getKeyword());
+            queryWrapper.like(wordsQuery.getSort().equals("all") || wordsQuery.getSort().equals("timeCycleName"),
+                    "time_cycle_name", wordsQuery.getKeyword());
             queryWrapper.or();
-            queryWrapper.like(wordsQuery.getSort().equals("all") || wordsQuery.getSort().equals("creator"), "username", wordsQuery.getKeyword());
+            queryWrapper.like(wordsQuery.getSort().equals("all") || wordsQuery.getSort().equals("creator"), "username",
+                    wordsQuery.getKeyword());
         }
         return queryWrapper;
     }

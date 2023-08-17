@@ -35,6 +35,9 @@ public class TimeCycle {
     @TableField(exist = false)
     private String creatorName;     //创建者名称
 
+    @TableField(exist = false)
+    private Integer quoteNum;       //引用次数
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -4,7 +4,7 @@
  * @email: 1301457114@qq.com
  * @Date: 2023-07-29 18:14:07
  * @LastEditors: wch
- * @LastEditTime: 2023-08-15 10:16:04
+ * @LastEditTime: 2023-08-15 14:41:33
  */
 
 package com.example.nfplus.mapper;
@@ -24,8 +24,8 @@ import java.util.List;
 public interface IndicatorMapper extends BaseMapper<Indicator> {
 	/**
 	 * @description: 按搜索条件不分页查询指标
-	 * @param {User}                    user 用户信息
-	 * @param {QueryWrapper<Indicator>} queryWrapper 搜索条件
+	 * @param user         请求查询的用户
+	 * @param queryWrapper 搜索条件
 	 * @return {List<Indicator>} 指标列表
 	 * @author: wch
 	 */
@@ -54,9 +54,9 @@ public interface IndicatorMapper extends BaseMapper<Indicator> {
 
 	/**
 	 * @description: 按搜索条件分页查询指标
-	 * @param {Page<Indicator>}         page 分页信息
-	 * @param {User}                    user 用户信息
-	 * @param {QueryWrapper<Indicator>} queryWrapper 搜索条件
+	 * @param page         分页信息
+	 * @param user         请求查询的用户
+	 * @param queryWrapper 搜索条件
 	 * @return {List<Indicator>} 指标列表
 	 * @author: wch
 	 */
@@ -87,8 +87,8 @@ public interface IndicatorMapper extends BaseMapper<Indicator> {
 
 	/**
 	 * @description: 按指标id查询指标
-	 * @param {User}   user 用户信息
-	 * @param {String} indicatorId 指标id
+	 * @param user        请求查询的用户
+	 * @param id 指标id
 	 * @return {Indicator} 指标信息
 	 * @author: wch
 	 */
@@ -102,7 +102,7 @@ public interface IndicatorMapper extends BaseMapper<Indicator> {
 			"LEFT JOIN time_cycles t ON i.time_cycle_id = t.time_cycle_id " +
 			"LEFT JOIN indicators de ON i.dependent_indicator_id = de.indicator_id " +
 			"LEFT JOIN user_collections c ON #{user.userId} = c.user_id AND i.indicator_id = c.indicator_id " +
-			"where indicator_id = #{id}")
+			"where i.indicator_id = #{id}")
 	@Results({
 			@Result(property = "indicatorId", column = "indicator_id", javaType = String.class, jdbcType = JdbcType.VARCHAR),
 			@Result(property = "isCollect", column = "isCollect", javaType = Boolean.class, jdbcType = JdbcType.BOOLEAN),
@@ -126,7 +126,7 @@ public interface IndicatorMapper extends BaseMapper<Indicator> {
 
 	/**
 	 * @description: 查找指标引用的所有衍生词
-	 * @param {String} id 指标id
+	 * @param id 指标id
 	 * @return {List<Integer>} 衍生词id列表
 	 * @author: wch
 	 */
@@ -135,7 +135,7 @@ public interface IndicatorMapper extends BaseMapper<Indicator> {
 
 	/**
 	 * @description: 查找指标引用的所有修饰词
-	 * @param {String} id 指标id
+	 * @param id 指标id
 	 * @return {List<Integer>} 修饰词id列表
 	 * @author: wch
 	 */
@@ -144,7 +144,7 @@ public interface IndicatorMapper extends BaseMapper<Indicator> {
 
 	/**
 	 * @description: 查找复合指标中所有参与运算的指标列表
-	 * @param {String} id 复合指标id
+	 * @param id 复合指标id
 	 * @return {List<String>} 参与运算的指标id列表
 	 * @author: wch
 	 */
@@ -153,7 +153,7 @@ public interface IndicatorMapper extends BaseMapper<Indicator> {
 
 	/**
 	 * @description: 查找引用了该指标作为运算指标的复合指标列表
-	 * @param {String} id 指标id
+	 * @param id 指标id
 	 * @return {List<String>} 复合指标id列表
 	 * @author: wch
 	 */
@@ -162,8 +162,8 @@ public interface IndicatorMapper extends BaseMapper<Indicator> {
 
 	/**
 	 * @description: 添加指标衍生词信息
-	 * @param {String} indicator_id 指标id
-	 * @param {int}    derivation_id 衍生词id
+	 * @param indicator_id  指标id
+	 * @param derivation_id 衍生词id
 	 * @return {*}
 	 * @author: wch
 	 */
@@ -172,8 +172,8 @@ public interface IndicatorMapper extends BaseMapper<Indicator> {
 
 	/**
 	 * @description: 添加指标修饰词信息
-	 * @param {String} indicator_id 指标id
-	 * @param {int}    modifier_id 修饰词id
+	 * @param indicator_id 指标id
+	 * @param modifier_id  修饰词id
 	 * @return {*}
 	 * @author: wch
 	 */
@@ -182,8 +182,8 @@ public interface IndicatorMapper extends BaseMapper<Indicator> {
 
 	/**
 	 * @description: 添加复合指标中参与运算的指标信息
-	 * @param {String} indicator_id 复合指标id
-	 * @param {String} composite_id 参与运算的指标id
+	 * @param indicator_id 复合指标id
+	 * @param composite_id 参与运算的指标id
 	 * @return {*}
 	 * @author: wch
 	 */
@@ -192,7 +192,7 @@ public interface IndicatorMapper extends BaseMapper<Indicator> {
 
 	/**
 	 * @description: 删除指标所有衍生词信息
-	 * @param {String} indicator_id 指标id
+	 * @param indicator_id 指标id
 	 * @return {*}
 	 * @author: wch
 	 */
@@ -201,7 +201,7 @@ public interface IndicatorMapper extends BaseMapper<Indicator> {
 
 	/**
 	 * @description: 删除指标所有修饰词信息
-	 * @param {String} indicator_id 指标id
+	 * @param indicator_id 指标id
 	 * @return {*}
 	 */
 	@Delete("delete from indicator_modifier where indicator_id = #{indicator_id}")
@@ -209,7 +209,7 @@ public interface IndicatorMapper extends BaseMapper<Indicator> {
 
 	/**
 	 * @description: 删除复合指标中所有参与运算的指标信息
-	 * @param {String} indicator_id 复合指标id
+	 * @param indicator_id 复合指标id
 	 * @return {*}
 	 */
 	@Delete("delete from indicator_composite_indicator where indicator_id = #{indicator_id}")

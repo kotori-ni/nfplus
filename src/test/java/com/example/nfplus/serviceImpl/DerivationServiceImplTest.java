@@ -18,12 +18,10 @@ class DerivationServiceImplTest {
 
     @Test
     public void getDerivationsTest(){
-        WordsQuery wordsQuery = new WordsQuery();
-        wordsQuery.setSort("creator");
-        wordsQuery.setKeyword("us");
-
-//        QueryWrapper queryWrapper = derivationService.getQueryWrapper(wordsQuery);
-//        System.out.println(queryWrapper.getCustomSqlSegment());
+        Derivation obj = new Derivation();
+        obj.setDerivationName("affaf");
+        Derivation derivation =derivationService.query().eq("derivation_name", obj.getDerivationName()).one();
+        System.out.println(derivation);
     }
 
     @Test

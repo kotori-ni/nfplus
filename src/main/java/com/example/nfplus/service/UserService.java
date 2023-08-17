@@ -4,7 +4,7 @@
  * @email: 1301457114@qq.com
  * @Date: 2023-07-29 16:54:35
  * @LastEditors: wch
- * @LastEditTime: 2023-08-15 14:15:34
+ * @LastEditTime: 2023-08-15 14:45:26
  */
 package com.example.nfplus.service;
 
@@ -19,7 +19,7 @@ import java.util.Map;
 public interface UserService extends IService<User> {
     /**
      * @description: 用户登录,生成用户token
-     * @param {User} user 登录用户
+     * @param user 登录用户
      * @return {User} 登录成功的用户信息
      * @author: wch
      */    
@@ -27,7 +27,7 @@ public interface UserService extends IService<User> {
 
     /**
      * @description: 根据token查找用户
-     * @param {String} token
+     * @param token
      * @return {User} 用户信息
      * @author: wch
      */    
@@ -42,7 +42,7 @@ public interface UserService extends IService<User> {
 
     /**
      * @description: 验证用户信息是否正确
-     * @param {User} user 待验证的用户对象
+     * @param user 待验证的用户对象
      * @return {Boolean} 验证结果,正确返回true,错误返回false
      * @author: wch
      */    
