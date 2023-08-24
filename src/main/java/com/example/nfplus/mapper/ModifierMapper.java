@@ -105,4 +105,12 @@ public interface ModifierMapper extends BaseMapper<Modifier> {
 	 */
 	@Select("select indicator_id from indicator_modifier where modifier_id = #{id}")
 	List<String> selectQuoteIndicators(int id);
+
+	/**
+	 * @desecription: 查询所有修饰词键名称
+	 * @return {List<String>} 修饰词键名称列表
+	 * @author wch
+	 */
+	@Select("select modifier_name from modifiers where modifier_key_id is null")
+	List<String> getAllModifierKeyName();
 }

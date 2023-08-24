@@ -204,6 +204,34 @@ public class ModifierServiceImpl extends ServiceImpl<ModifierMapper, Modifier> i
     }
 
     /**
+     * @description: 批量新增修饰词
+     * @param user     请求新增的用户
+     * @param modifiers 新增的修饰词
+     * @return {*}
+     * @author: wch
+     */
+    @Override
+    @Transactional
+    public void batchAddModifier(User user, List<Modifier> modifiers) {
+        for (int i = 0; i < modifiers.size(); i++){
+            if (modifiers.get(i).getModifierValueNames() == null || modifiers.get(i).getModifierValueNames().size() == 0)
+                continue;
+
+            QueryWrapper<Modifier> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("modifier_name", modifiers.get(i).getModifierName());
+            queryWrapper.isNull("modifier_key_id");
+            Modifier modifierKey = getOne(queryWrapper);
+            for (int j = 0; j < modifiers.get(i).getModifierValueNames().size(); j++){
+                Modifier modifierValue = new Modifier();
+                modifierValue.setModifierName(modifiers.get(i).getModifierValueNames().get(j));
+                modifierValue.setParentModifierId(modifierKey.getModifierId());
+                modifierValue.setCreatorId(user.getUserId());
+                save(modifierValue);
+            }
+        }
+    }
+
+    /**
      * @description: 更新修饰词信息
      * @param user     请求更新的用户
      * @param modifier 更新的修饰词

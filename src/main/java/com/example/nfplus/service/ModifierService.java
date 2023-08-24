@@ -67,6 +67,15 @@ public interface ModifierService extends IService<Modifier> {
     public void addModifier(User user, Modifier modifier);
 
     /**
+     * @description: 批量新增修饰词
+     * @param user     请求新增的用户
+     * @param modifiers 新增的修饰词
+     * @return {*}
+     * @author: wch
+     */
+    public void batchAddModifier(User user, List<Modifier> modifiers);
+
+    /**
      * @description: 根据修饰词键的名称获取修饰词键
      * @param name 修饰词键名称
      * @return {Modifier} 修饰词键对象

@@ -53,7 +53,7 @@ public class CollectionController {
     /**
      * @description: 删除收藏
      * @param token      用户token
-     * @param collection
+     * @param collection 待收藏的对象
      * @return ResultUtils
      * @author: wch
      */

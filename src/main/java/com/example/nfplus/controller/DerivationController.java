@@ -151,7 +151,7 @@ public class DerivationController {
         }
         Set<String> set = new HashSet<>(newNames);
         if (set.size() < newNames.size())
-            return ResultUtils.error().message("存在名称重复的时间周期");
+            return ResultUtils.error().message("存在名称重复的衍生词");
 
         try {
             derivationService.saveBatch(derivations);

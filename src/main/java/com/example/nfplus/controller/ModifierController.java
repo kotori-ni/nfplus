@@ -12,17 +12,25 @@ package com.example.nfplus.controller;
 import com.example.nfplus.entity.Modifier;
 import com.example.nfplus.entity.User;
 import com.example.nfplus.entity.WordsQuery;
+import com.example.nfplus.mapper.ModifierMapper;
 import com.example.nfplus.service.ModifierService;
 import com.example.nfplus.service.UserService;
 import com.example.nfplus.utils.ResultUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 @RestController
 @RequestMapping("/modifier")
 public class ModifierController {
     @Autowired
     private ModifierService modifierService;
+    @Autowired
+    private ModifierMapper modifierMapper;
     @Autowired
     private UserService userService;
 
@@ -113,6 +121,47 @@ public class ModifierController {
             return ResultUtils.error().message("添加修饰词失败");
         }
     }
+
+    /**
+     * @description: 批量添加修饰词
+     * @param token    用户token
+     * @param modifiers 修饰词列表
+     * @return {ResultUtils}
+     * @author: wch
+     */
+    @PostMapping("/batch_add")
+    public ResultUtils batchAddModifier(@RequestHeader("Authorization") String token, @RequestBody List<Modifier> modifiers){
+        User user = userService.findUserByToken(token);
+        List<String> newNames = new ArrayList<>();
+        List<String> existNames = modifierMapper.getAllModifierKeyName();
+
+        for (int i = 0; i < modifiers.size(); i++){
+            if (modifiers.get(i).getModifierName() == null || modifiers.get(i).getModifierName().length() == 0)
+                return ResultUtils.error().message("第" + (i + 1) + "行的修饰词缺少修饰词名称");
+            if (existNames.contains(modifiers.get(i).getModifierName()))
+                return ResultUtils.error().message("修饰词" + modifiers.get(i).getModifierName() + "已存在");
+            if (modifiers.get(i).getDescription() != null && modifiers.get(i).getDescription().length() > 255)
+                return ResultUtils.error().message("第" + (i + 1) + "行的修饰词描述过长");
+            modifiers.get(i).setModifierId(null);
+            modifiers.get(i).setCreatorId(user.getUserId());
+            newNames.add(modifiers.get(i).getModifierName());
+        }
+
+        Set<String> set = new HashSet<>(newNames);
+        if (set.size() < newNames.size())
+            return ResultUtils.error().message("存在名称重复的修饰词");
+
+        try{
+            modifierService.saveBatch(modifiers);
+            modifierService.batchAddModifier(user, modifiers);
+            return ResultUtils.ok().message("批量添加修饰词成功");
+        } catch (Exception e){
+            e.printStackTrace();
+            return ResultUtils.error().message("批量添加修饰词失败");
+        }
+    }
+
+
 
     /**
      * @description: 更新修饰词信息

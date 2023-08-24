@@ -38,6 +38,8 @@ public class Modifier{
 
     @TableField(exist = false)
     private List<Modifier> modifierValues;  //修饰词值列表
+    @TableField(exist = false)
+    private List<String> modifierValueNames; //修饰词值名称列表
 
     @TableField(exist = false)
     private String creatorName;             //创建者名称
